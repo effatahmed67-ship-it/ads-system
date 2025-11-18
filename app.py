@@ -2,14 +2,13 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
 from werkzeug.utils import secure_filename
-from datetime import datetime
 import pandas as pd
 
 app = Flask(__name__)
 app.secret_key = "ads_system_2025"
 
 # ============================
-#   PATHS
+# PATHS
 # ============================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "database.db")
@@ -22,7 +21,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
 # ============================
-#   DB CONNECTION
+# DATABASE CONNECTION
 # ============================
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -31,7 +30,7 @@ def get_db():
 
 
 # ============================
-#   INIT DATABASE
+# INIT DB
 # ============================
 def init_db():
     conn = get_db()
@@ -97,23 +96,21 @@ init_db()
 
 
 # ============================
-#   HOME
+# ROUTES
 # ============================
+
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# ============================
-#   COMPANIES
-# ============================
+# ----------- Companies ----------
 @app.route("/companies")
 def companies():
     conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT * FROM companies ORDER BY id DESC")
-    data = cur.fetchall()
-    return render_template("companies.html", companies=data)
+    return render_template("companies.html", companies=cur.fetchall())
 
 
 @app.route("/add_company", methods=["POST"])
@@ -133,16 +130,13 @@ def add_company():
     return redirect(url_for("companies"))
 
 
-# ============================
-#   CLIENTS
-# ============================
+# ----------- Clients ----------
 @app.route("/clients")
 def clients():
     conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT * FROM clients ORDER BY id DESC")
-    data = cur.fetchall()
-    return render_template("add-client.html", clients=data)
+    return render_template("add-client.html", clients=cur.fetchall())
 
 
 @app.route("/add_client", methods=["POST"])
@@ -163,13 +157,12 @@ def add_client():
     return redirect(url_for("clients"))
 
 
-# ============================
-#   ADD ADS
-# ============================
+# ----------- Ads ----------
 @app.route("/add_ad")
 def add_ad():
     conn = get_db()
     cur = conn.cursor()
+
     cur.execute("SELECT * FROM companies")
     companies = cur.fetchall()
 
@@ -206,9 +199,7 @@ def save_ad():
     return redirect(url_for("add_ad"))
 
 
-# ============================
-#   ADD CONTRACT
-# ============================
+# ----------- Contracts ----------
 @app.route("/add_contract")
 def add_contract():
     conn = get_db()
@@ -251,9 +242,7 @@ def save_contract():
     return redirect(url_for("add_contract"))
 
 
-# ============================
-#   ADS REPORT
-# ============================
+# ----------- Reports ----------
 @app.route("/ads_report")
 def ads_report():
     conn = get_db()
@@ -265,13 +254,9 @@ def ads_report():
         LEFT JOIN companies ON ads.company_id = companies.id
         ORDER BY ads.id DESC
     """)
-    data = cur.fetchall()
-    return render_template("ads-report.html", ads=data)
+    return render_template("ads-report.html", ads=cur.fetchall())
 
 
-# ============================
-#   CONTRACT REPORT
-# ============================
 @app.route("/contracts_report")
 def contracts_report():
     conn = get_db()
@@ -283,13 +268,10 @@ def contracts_report():
         LEFT JOIN companies ON contracts.company_id = companies.id
         ORDER BY contracts.id DESC
     """)
-    data = cur.fetchall()
-    return render_template("contracts-report.html", contracts=data)
+    return render_template("contracts-report.html", contracts=cur.fetchall())
 
 
-# ============================
-#   SEARCH PAGE
-# ============================
+# ----------- Search ----------
 @app.route("/search")
 def search():
     return render_template("search.html")
@@ -298,19 +280,14 @@ def search():
 @app.route("/search_do", methods=["POST"])
 def search_do():
     name = request.form.get("name")
+
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("""
-        SELECT * FROM clients
-        WHERE name LIKE ?
-    """, ("%" + name + "%",))
-    data = cur.fetchall()
-    return render_template("search.html", results=data)
+    cur.execute("SELECT * FROM clients WHERE name LIKE ?", ("%"+name+"%",))
+    return render_template("search.html", results=cur.fetchall())
 
 
-# ============================
-#   IMPORT ADS (EXCEL)
-# ============================
+# ----------- Import Ads Excel ----------
 @app.route("/import_ads")
 def import_ads():
     return render_template("import_ads.html")
@@ -329,31 +306,24 @@ def upload_ads():
     cur = conn.cursor()
 
     for _, row in df.iterrows():
-        name = row.get("name")
+        title = row.get("name")
         date = row.get("date")
 
-        if pd.isna(name) or pd.isna(date):
+        if pd.isna(title) or pd.isna(date):
             continue
 
-        cur.execute("""
-            INSERT INTO ads (title, ad_date)
-            VALUES (?, ?)
-        """, (name, date))
+        cur.execute("INSERT INTO ads (title, ad_date) VALUES (?, ?)", (title, date))
 
     conn.commit()
     return redirect(url_for("ads_report"))
 
 
-# ============================
-#   STATIC FILES
-# ============================
+# ----------- Upload Static Files ----------
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 
-# ============================
-#   RUN
-# ============================
+# ----------- Run ----------
 if __name__ == "__main__":
     app.run(debug=True)
