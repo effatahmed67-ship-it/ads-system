@@ -1,50 +1,78 @@
 {% extends "base.html" %}
-
 {% block title %}البحث عن عميل{% endblock %}
 
 {% block content %}
-<div class="card-page">
-    <h1 class="page-title">البحث عن عميل بالاسم</h1>
 
-    <form method="post" action="{{ url_for('search_do') }}">
-        <div class="mb-3">
-            <input type="text"
-                   name="name"
-                   class="form-control form-control-lg"
-                   placeholder="اكتب جزء من اسم العميل">
+<div class="odoo-page-header mb-3">
+    <div>
+        <div class="page-title">البحث عن عميل</div>
+        <p class="page-subtitle">
+            اكتب جزء من اسم العميل لعرض النتائج، أو اترك الحقل فارغاً لعرض كل العملاء.
+        </p>
+    </div>
+
+    <!-- زر تصدير النتائج أو الكل -->
+    <div class="odoo-actions">
+        <a href="{{ url_for('export_clients', name=search_name or '') }}"
+           class="btn btn-sm btn-outline-light">
+            ⬇ تصدير النتائج إلى Excel
+        </a>
+    </div>
+</div>
+
+<div class="odoo-card">
+
+    <!-- فورم البحث -->
+    <form method="post" action="{{ url_for('search') }}" class="mb-3">
+        <div class="odoo-form-row align-items-end">
+            <div class="flex-grow-1">
+                <label class="odoo-label">اسم العميل</label>
+                <input type="text"
+                       name="name"
+                       value="{{ search_name or '' }}"
+                       class="form-control odoo-input search-input-large"
+                       placeholder="اكتب جزء من اسم العميل أو اتركه فارغاً لعرض الكل">
+            </div>
+            <div>
+                <button type="submit" class="odoo-btn-primary mt-3">
+                    بحث
+                </button>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary btn-lg">
-            بحث
-        </button>
     </form>
 
+    <!-- جدول النتائج -->
     {% if results %}
-        <hr class="my-4">
-        <h5 class="mb-3">نتائج البحث</h5>
         <div class="table-responsive">
-            <table class="table table-striped align-middle">
+            <table class="table table-hover align-middle odoo-table">
                 <thead>
                 <tr>
+                    <th>#</th>
                     <th>الاسم</th>
                     <th>العنوان</th>
                     <th>الهاتف</th>
                     <th>رقم الحساب</th>
-                    <th>البنك</th>
+                    <th>اسم البنك</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for row in results %}
+                {% for r in results %}
                     <tr>
-                        <td>{{ row['name'] }}</td>
-                        <td>{{ row['address'] }}</td>
-                        <td>{{ row['phone'] }}</td>
-                        <td>{{ row['account_number'] }}</td>
-                        <td>{{ row['bank_name'] }}</td>
+                        <td>{{ r["id"] }}</td>
+                        <td>{{ r["name"] }}</td>
+                        <td>{{ r["address"] }}</td>
+                        <td>{{ r["phone"] }}</td>
+                        <td>{{ r["account_number"] }}</td>
+                        <td>{{ r["bank_name"] }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
+    {% elif search_name is defined %}
+        <p class="text-muted mb-0">لا توجد نتائج مطابقة لبحثك.</p>
     {% endif %}
+
 </div>
+
 {% endblock %}
