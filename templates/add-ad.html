@@ -1,1 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="mb-4">إضافة إعلان جديد</h3>
+
+<div class="card p-4 shadow-sm">
+
+    <form method="post">
+
+        <div class="mb-3">
+            <label class="form-label">اسم العميل</label>
+            <select name="client" class="form-select">
+                {% for c in clients %}
+                    <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">العنوان</label>
+            <input type="text" name="address" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">رقم الحساب</label>
+            <input type="text" name="account" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">اسم إصدار الشيك</label>
+            <input type="text" name="cheque" class="form-control">
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">المبلغ</label>
+                <input type="number" name="amount" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">تاريخ الإعلان</label>
+                <input type="date" name="ad_date" class="form-control">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">حالة الإعلان</label>
+            <select name="status" class="form-select">
+                <option>لم يتم</option>
+                <option>تم</option>
+            </select>
+        </div>
+
+        <button class="btn btn-success px-5 mt-3">حفظ</button>
+
+    </form>
+
+</div>
+
+{% endblock %}
 
