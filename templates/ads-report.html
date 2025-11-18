@@ -1,78 +1,48 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h3 class="mb-4">تقارير الإعلانات</h3>
+<div class="container">
+    <h3 class="mb-4">تقرير الإعلانات</h3>
 
-<div class="card p-4 shadow-sm">
-
-    <form method="post">
-
-        <div class="row g-3">
-
-            <div class="col-md-4">
-                <label>من تاريخ</label>
-                <input type="date" name="from_date" class="form-control">
-            </div>
-
-            <div class="col-md-4">
-                <label>إلى تاريخ</label>
-                <input type="date" name="to_date" class="form-control">
-            </div>
-
-            <div class="col-md-4">
-                <label>اسم العميل</label>
-                <select name="client" class="form-select">
-                    <option value="">الكل</option>
-                    {% for c in clients %}
-                        <option value="{{ c.id }}">{{ c.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-        </div>
-
-        <button class="btn btn-primary mt-3">بحث</button>
-    </form>
-
-</div>
-
-<hr>
-
-<div class="card p-3 shadow-sm">
-
-    <h5 class="mb-3">نتائج البحث</h5>
-
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>التاريخ</th>
-                <th>العميل</th>
-                <th>العنوان</th>
-                <th>رقم الحساب</th>
-                <th>اسم إصدار الشيك</th>
-                <th>المبلغ</th>
-                <th>الحالة</th>
-                <th>ملاحظات</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for ad in ads %}
-            <tr>
-                <td>{{ ad.date }}</td>
-                <td>{{ ad.client }}</td>
-                <td>{{ ad.address }}</td>
-                <td>{{ ad.account }}</td>
-                <td>{{ ad.cheque }}</td>
-                <td>{{ ad.amount }}</td>
-                <td>{{ ad.status }}</td>
-                <td>{{ ad.notes }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="card p-3">
+        <table class="table table-bordered table-striped table-sm align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>التاريخ</th>
+                    <th>العميل</th>
+                    <th>الشركة</th>
+                    <th>العنوان</th>
+                    <th>المبلغ</th>
+                    <th>الحالة</th>
+                    <th>ملاحظات</th>
+                    <th>مرفق</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ad in ads %}
+                <tr>
+                    <td>{{ ad.id }}</td>
+                    <td>{{ ad.ad_date }}</td>
+                    <td>{{ ad.client_name }}</td>
+                    <td>{{ ad.company_name }}</td>
+                    <td>{{ ad.title }}</td>
+                    <td>{{ "%.2f"|format(ad.amount or 0) }}</td>
+                    <td>{{ ad.ad_status }}</td>
+                    <td>{{ ad.notes }}</td>
+                    <td>
+                        {% if ad.attachment %}
+                        <a href="{{ url_for('uploaded_file', filename=ad.attachment) }}" target="_blank">عرض</a>
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 </div>
 
 {% endblock %}
-
