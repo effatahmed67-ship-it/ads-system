@@ -1,8 +1,20 @@
 import os
 import sqlite3
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
+from io import BytesIO
+
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    send_from_directory,
+    send_file,
+    flash,
+)
 from werkzeug.utils import secure_filename
 import pandas as pd
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "ads_system_2025"
@@ -36,15 +48,20 @@ def init_db():
     conn = get_db()
     cur = conn.cursor()
 
-    cur.execute("""
+    # شركات
+    cur.execute(
+        """
         CREATE TABLE IF NOT EXISTS companies (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             logo TEXT
         )
-    """)
+    """
+    )
 
-    cur.execute("""
+    # عملاء
+    cur.execute(
+        """
         CREATE TABLE IF NOT EXISTS clients (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -53,9 +70,12 @@ def init_db():
             account_number TEXT,
             bank_name TEXT
         )
-    """)
+    """
+    )
 
-    cur.execute("""
+    # إعلانات
+    cur.execute(
+        """
         CREATE TABLE IF NOT EXISTS ads (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             client_id INTEGER,
@@ -69,9 +89,12 @@ def init_db():
             FOREIGN KEY(client_id) REFERENCES clients(id),
             FOREIGN KEY(company_id) REFERENCES companies(id)
         )
-    """)
+    """
+    )
 
-    cur.execute("""
+    # عقود
+    cur.execute(
+        """
         CREATE TABLE IF NOT EXISTS contracts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             client_id INTEGER,
@@ -86,7 +109,8 @@ def init_db():
             FOREIGN KEY(client_id) REFERENCES clients(id),
             FOREIGN KEY(company_id) REFERENCES companies(id)
         )
-    """)
+    """
+    )
 
     conn.commit()
     conn.close()
@@ -99,6 +123,7 @@ init_db()
 # ROUTES
 # ============================
 
+# ----------- Home ----------
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -110,7 +135,8 @@ def companies():
     conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT * FROM companies ORDER BY id DESC")
-    return render_template("companies.html", companies=cur.fetchall())
+    companies = cur.fetchall()
+    return render_template("companies.html", companies=companies)
 
 
 @app.route("/add_company", methods=["POST"])
@@ -125,7 +151,10 @@ def add_company():
 
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("INSERT INTO companies (name, logo) VALUES (?, ?)", (name, filename))
+    cur.execute(
+        "INSERT INTO companies (name, logo) VALUES (?, ?)",
+        (name, filename),
+    )
     conn.commit()
     return redirect(url_for("companies"))
 
@@ -136,7 +165,8 @@ def clients():
     conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT * FROM clients ORDER BY id DESC")
-    return render_template("add-client.html", clients=cur.fetchall())
+    clients = cur.fetchall()
+    return render_template("add-client.html", clients=clients)
 
 
 @app.route("/add_client", methods=["POST"])
@@ -149,15 +179,18 @@ def add_client():
 
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         INSERT INTO clients (name, address, phone, account_number, bank_name)
         VALUES (?, ?, ?, ?, ?)
-    """, (name, address, phone, account_number, bank_name))
+    """,
+        (name, address, phone, account_number, bank_name),
+    )
     conn.commit()
     return redirect(url_for("clients"))
 
 
-# ----------- Ads ----------
+# ----------- Ads (إعلانات) ----------
 @app.route("/add_ad")
 def add_ad():
     conn = get_db()
@@ -178,7 +211,7 @@ def save_ad():
     company_id = request.form.get("company")
     title = request.form.get("title")
     notes = request.form.get("notes")
-    amount = request.form.get("amount")
+    amount = request.form.get("amount") or 0
     ad_status = request.form.get("ad_status")
     ad_date = request.form.get("ad_date")
 
@@ -190,16 +223,23 @@ def save_ad():
 
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO ads (client_id, company_id, title, notes, amount, ad_status, ad_date, attachment)
+    cur.execute(
+        """
+        INSERT INTO ads (
+            client_id, company_id, title, notes, amount,
+            ad_status, ad_date, attachment
+        )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (client_id, company_id, title, notes, amount, ad_status, ad_date, filename))
+    """,
+        (client_id, company_id, title, notes, amount, ad_status, ad_date, filename),
+    )
 
     conn.commit()
+    flash("تم حفظ الإعلان بنجاح")
     return redirect(url_for("add_ad"))
 
 
-# ----------- Contracts ----------
+# ----------- Contracts (عقود) ----------
 @app.route("/add_contract")
 def add_contract():
     conn = get_db()
@@ -223,7 +263,7 @@ def save_contract():
     notes = request.form.get("notes")
     start_date = request.form.get("start_date")
     end_date = request.form.get("end_date")
-    amount = request.form.get("amount")
+    amount = request.form.get("amount") or 0
 
     file = request.files.get("attachment")
     filename = None
@@ -233,42 +273,154 @@ def save_contract():
 
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO contracts (client_id, company_id, contract_number, title, amount, start_date, end_date, notes, attachment)
+    cur.execute(
+        """
+        INSERT INTO contracts (
+            client_id, company_id, contract_number,
+            title, amount, start_date, end_date,
+            notes, attachment
+        )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (client_id, company_id, contract_number, title, amount, start_date, end_date, notes, filename))
+    """,
+        (
+            client_id,
+            company_id,
+            contract_number,
+            title,
+            amount,
+            start_date,
+            end_date,
+            notes,
+            filename,
+        ),
+    )
 
     conn.commit()
+    flash("تم حفظ العقد بنجاح")
     return redirect(url_for("add_contract"))
 
 
-# ----------- Reports ----------
+# ----------- Reports (تقارير) ----------
 @app.route("/ads_report")
 def ads_report():
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("""
-        SELECT ads.*, clients.name AS client_name, companies.name AS company_name
+    cur.execute(
+        """
+        SELECT ads.*,
+               clients.name   AS client_name,
+               companies.name AS company_name
         FROM ads
-        LEFT JOIN clients ON ads.client_id = clients.id
+        LEFT JOIN clients   ON ads.client_id = clients.id
         LEFT JOIN companies ON ads.company_id = companies.id
         ORDER BY ads.id DESC
-    """)
-    return render_template("ads-report.html", ads=cur.fetchall())
+    """
+    )
+    rows = cur.fetchall()
+    return render_template("ads-report.html", ads=rows)
 
 
 @app.route("/contracts_report")
 def contracts_report():
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("""
-        SELECT contracts.*, clients.name AS client_name, companies.name AS company_name
+    cur.execute(
+        """
+        SELECT contracts.*,
+               clients.name   AS client_name,
+               companies.name AS company_name
         FROM contracts
-        LEFT JOIN clients ON contracts.client_id = clients.id
+        LEFT JOIN clients   ON contracts.client_id = clients.id
         LEFT JOIN companies ON contracts.company_id = companies.id
         ORDER BY contracts.id DESC
-    """)
-    return render_template("contracts-report.html", contracts=cur.fetchall())
+    """
+    )
+    rows = cur.fetchall()
+    return render_template("contracts-report.html", contracts=rows)
+
+
+# ====== Export Reports to Excel ======
+@app.route("/ads_report/export")
+def export_ads_report():
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT
+            ads.id          AS ad_id,
+            ads.ad_date     AS date,
+            clients.name    AS client,
+            companies.name  AS company,
+            ads.title       AS title,
+            ads.amount      AS amount,
+            ads.ad_status   AS status,
+            ads.notes       AS notes
+        FROM ads
+        LEFT JOIN clients   ON ads.client_id   = clients.id
+        LEFT JOIN companies ON ads.company_id = companies.id
+        ORDER BY ads.id DESC
+    """
+    )
+    rows = cur.fetchall()
+    data = [dict(r) for r in rows]
+
+    df = pd.DataFrame(data)
+
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False, sheet_name="Ads")
+    output.seek(0)
+
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name="ads_report.xlsx",
+        mimetype=(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ),
+    )
+
+
+@app.route("/contracts_report/export")
+def export_contracts_report():
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT
+            contracts.id            AS contract_id,
+            contracts.contract_number,
+            clients.name            AS client,
+            companies.name          AS company,
+            contracts.title         AS title,
+            contracts.amount        AS amount,
+            contracts.start_date    AS start_date,
+            contracts.end_date      AS end_date,
+            contracts.notes         AS notes
+        FROM contracts
+        LEFT JOIN clients   ON contracts.client_id   = clients.id
+        LEFT JOIN companies ON contracts.company_id = companies.id
+        ORDER BY contracts.id DESC
+    """
+    )
+    rows = cur.fetchall()
+    data = [dict(r) for r in rows]
+
+    df = pd.DataFrame(data)
+
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False, sheet_name="Contracts")
+    output.seek(0)
+
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name="contracts_report.xlsx",
+        mimetype=(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ),
+    )
 
 
 # ----------- Search ----------
@@ -283,42 +435,114 @@ def search_do():
 
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM clients WHERE name LIKE ?", ("%"+name+"%",))
-    return render_template("search.html", results=cur.fetchall())
+    cur.execute(
+        "SELECT * FROM clients WHERE name LIKE ?",
+        ("%" + name + "%",),
+    )
+    results = cur.fetchall()
+    return render_template("search.html", results=results, search_name=name)
 
 
-# ----------- Import Ads Excel ----------
+# ----------- Import Ads from Excel ----------
 @app.route("/import_ads")
 def import_ads():
+    # صفحة الاستيراد نفسها (فيها زر رفع الملف + زر تحميل القالب)
     return render_template("import_ads.html")
+
+
+# ✅ توليد ملف القالب Template للإعلانات
+@app.route("/import_ads/template")
+def download_ads_template():
+    # الأعمدة اللي هيشتغل عليها النظام
+    columns = ["name", "date", "amount", "status", "notes"]
+
+    sample_data = [
+        {
+            "name": "حملة انستقرام",
+            "date": datetime.today().date().isoformat(),
+            "amount": 1000,
+            "status": "لم يتم",
+            "notes": "مثال فقط - احذف الصف",
+        }
+    ]
+
+    df = pd.DataFrame(sample_data, columns=columns)
+
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False, sheet_name="AdsTemplate")
+    output.seek(0)
+
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name="ads_import_template.xlsx",
+        mimetype=(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ),
+    )
 
 
 @app.route("/upload_ads", methods=["POST"])
 def upload_ads():
     file = request.files.get("file")
-    if not file:
-        flash("لم يتم اختيار ملف")
+    if not file or file.filename == "":
+        flash("لم يتم اختيار ملف Excel")
         return redirect(url_for("import_ads"))
 
-    df = pd.read_excel(file)
+    try:
+        df = pd.read_excel(file)
+    except Exception as e:
+        flash(f"خطأ في قراءة الملف: {e}")
+        return redirect(url_for("import_ads"))
+
+    # نتأكد أن الأعمدة المطلوبة موجودة
+    required_cols = {"name", "date"}
+    if not required_cols.issubset(set(map(str.lower, df.columns))):
+        flash("يجب أن يحتوي الملف على أعمدة: name و date على الأقل.")
+        return redirect(url_for("import_ads"))
 
     conn = get_db()
     cur = conn.cursor()
 
-    for _, row in df.iterrows():
-        title = row.get("name")
-        date = row.get("date")
+    inserted = 0
 
-        if pd.isna(title) or pd.isna(date):
+    for _, row in df.iterrows():
+        # نقرأ بنفس أسماء الأعمدة في القالب
+        title = row.get("name") or row.get("Name")
+        date_val = row.get("date") or row.get("Date")
+        amount = row.get("amount") or row.get("Amount") or 0
+        status = row.get("status") or row.get("Status") or None
+        notes = row.get("notes") or row.get("Notes") or None
+
+        # نتأكد من وجود اسم وتاريخ
+        if pd.isna(title) or pd.isna(date_val):
             continue
 
-        cur.execute("INSERT INTO ads (title, ad_date) VALUES (?, ?)", (title, date))
+        # تحويل التاريخ إلى نص
+        if isinstance(date_val, (pd.Timestamp, datetime)):
+            date_str = date_val.date().isoformat()
+        else:
+            date_str = str(date_val)
+
+        cur.execute(
+            """
+            INSERT INTO ads (
+                client_id, company_id, title, notes,
+                amount, ad_status, ad_date, attachment
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+            (None, None, title, notes, amount, status, date_str, None),
+        )
+        inserted += 1
 
     conn.commit()
+    flash(f"تم استيراد {inserted} إعلان من الملف.")
     return redirect(url_for("ads_report"))
 
 
-# ----------- Upload Static Files ----------
+# ----------- Uploads (ملفات مرفقة) ----------
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
@@ -326,4 +550,5 @@ def uploaded_file(filename):
 
 # ----------- Run ----------
 if __name__ == "__main__":
-    app.run(debug=True)
+    # لو تجرّب محليًا
+    app.run(debug=True, host="0.0.0.0", port=5000)
