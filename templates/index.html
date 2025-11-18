@@ -1,1 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <h2 class="mb-4">مرحباً بك في نظام إدارة الإعلانات</h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <a href="/clients" class="btn btn-primary w-100">العملاء</a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="/add_ad" class="btn btn-success w-100">الإعلانات</a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="/add_contract" class="btn btn-warning w-100">العقود</a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
 
