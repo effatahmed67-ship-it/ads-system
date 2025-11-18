@@ -1,32 +1,32 @@
 {% extends "base.html" %}
+{% block title %}استيراد الإعلانات من Excel{% endblock %}
+
 {% block content %}
 
-<div class="container">
-    <h3 class="mb-4">استيراد الإعلانات من ملف Excel</h3>
-
-    <div class="card p-4">
-
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="alert alert-warning">
-                {% for m in messages %}
-                    <div>{{ m }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-        {% endwith %}
-
-        <form method="post" action="{{ url_for('upload_ads') }}" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label class="form-label">اختر ملف الإكسل</label>
-                <input type="file" name="file" class="form-control" required>
-                <small class="text-muted">يجب أن يحتوي الملف على أعمدة: name ، date على الأقل.</small>
-            </div>
-
-            <button class="btn btn-success mt-2">رفع واستيراد</button>
-        </form>
+<div class="odoo-page-header mb-3">
+    <div>
+        <div class="page-title">استيراد الإعلانات من ملف Excel</div>
+        <p class="page-subtitle">
+            حمّل القالب، عبّيه بالبيانات، ثم ارفعه للاستيراد
+        </p>
     </div>
 
+    <a href="{{ url_for('download_ads_template') }}"
+       class="btn btn-sm btn-outline-light">
+        ⬇ تحميل قالب الاستيراد
+    </a>
+</div>
+
+<div class="odoo-card">
+    <form method="post" action="{{ url_for('upload_ads') }}" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label class="odoo-label">اختر ملف Excel</label>
+            <input type="file" name="file" class="form-control odoo-input" accept=".xlsx,.xls">
+        </div>
+        <button type="submit" class="odoo-btn-primary">
+            استيراد الآن
+        </button>
+    </form>
 </div>
 
 {% endblock %}
