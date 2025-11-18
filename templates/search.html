@@ -1,54 +1,47 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h3 class="mb-4">بحث بالعناوين</h3>
+<div class="container">
+    <h3 class="mb-4">البحث عن عميل بالاسم</h3>
 
-<div class="card p-4 shadow-sm">
+    <div class="card p-4 mb-4">
+        <form method="post" action="{{ url_for('search_do') }}">
+            <label class="form-label">اكتب جزء من اسم العميل</label>
+            <input type="text" name="name" class="form-control" required>
+            <button class="btn btn-primary mt-3">بحث</button>
+        </form>
+    </div>
 
-    <form method="post">
-        <label>اكتب العنوان</label>
-        <input type="text" name="search_text" class="form-control">
-        <button class="btn btn-primary mt-3">بحث</button>
-    </form>
+    {% if results %}
+    <div class="card p-3">
+        <h5>نتائج البحث</h5>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>الرقم</th>
+                    <th>الاسم</th>
+                    <th>العنوان</th>
+                    <th>الهاتف</th>
+                    <th>رقم الحساب</th>
+                    <th>البنك</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in results %}
+                <tr>
+                    <td>{{ c.id }}</td>
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.address }}</td>
+                    <td>{{ c.phone }}</td>
+                    <td>{{ c.account_number }}</td>
+                    <td>{{ c.bank_name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
 
 </div>
-
-<hr>
-
-{% if results %}
-<div class="card p-3 shadow-sm">
-    <h5 class="mb-3">نتائج البحث</h5>
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>العميل</th>
-                <th>العنوان</th>
-                <th>رقم الحساب</th>
-                <th>اسم إصدار الشيك</th>
-                <th>نوع العملية</th>
-                <th>التاريخ</th>
-                <th>المبلغ</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for r in results %}
-            <tr>
-                <td>{{ r.client }}</td>
-                <td>{{ r.address }}</td>
-                <td>{{ r.account }}</td>
-                <td>{{ r.cheque }}</td>
-                <td>{{ r.type }}</td>
-                <td>{{ r.date }}</td>
-                <td>{{ r.amount }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-
-    </table>
-</div>
-{% endif %}
 
 {% endblock %}
-
