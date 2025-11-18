@@ -1,1 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">مرحباً بك في نظام تسجيل الحملات</h2>
+
+    <div class="card p-4 shadow-sm">
+        <h5>القائمة السريعة</h5>
+        <hr>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <a href="/add-client" class="btn btn-primary w-100">➕ إضافة عميل جديد</a>
+            </div>
+
+            <div class="col-md-4">
+                <a href="/add-ad" class="btn btn-success w-100">📢 تسجيل إعلان</a>
+            </div>
+
+            <div class="col-md-4">
+                <a href="/add-contract" class="btn btn-warning w-100">📄 إضافة عقد</a>
+            </div>
+
+            <div class="col-md-4">
+                <a href="/ads-report" class="btn btn-dark w-100">📊 تقارير الإعلانات</a>
+            </div>
+
+            <div class="col-md-4">
+                <a href="/contracts-report" class="btn btn-dark w-100">📑 تقارير العقود</a>
+            </div>
+
+            <div class="col-md-4">
+                <a href="/search" class="btn btn-info w-100">🔍 بحث بالعناوين</a>
+            </div>
+
+            <div class="col-md-4">
+                <a href="/companies" class="btn btn-secondary w-100">🏢 إدارة الشركات</a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
 
