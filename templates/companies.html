@@ -1,67 +1,55 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h3 class="mb-4">إدارة الشركات</h3>
+<div class="container">
+    <h3 class="mb-4">إدارة الشركات</h3>
 
-<div class="card p-4 shadow-sm">
+    <div class="card p-4 mb-4">
+        <form method="post" action="{{ url_for('add_company') }}" enctype="multipart/form-data">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label">اسم الشركة</label>
+                    <input type="text" name="company_name" class="form-control" required>
+                </div>
 
-    <form method="post" enctype="multipart/form-data">
-
-        <div class="row g-3">
-
-            <div class="col-md-8">
-                <label>اسم الشركة</label>
-                <input type="text" name="name" class="form-control">
+                <div class="col-md-4">
+                    <label class="form-label">شعار الشركة (اختياري)</label>
+                    <input type="file" name="logo" class="form-control">
+                </div>
             </div>
 
-            <div class="col-md-4">
-                <label>شعار الشركة (اختياري)</label>
-                <input type="file" name="logo" class="form-control">
-            </div>
+            <button class="btn btn-primary mt-3">حفظ الشركة</button>
+        </form>
+    </div>
 
-        </div>
-
-        <button class="btn btn-primary mt-3">حفظ</button>
-
-    </form>
-
-</div>
-
-<hr>
-
-<div class="card p-3 shadow-sm">
-
-    <h5>قائمة الشركات</h5>
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>الشركة</th>
-                <th>الشعار</th>
-                <th>تحكم</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for company in companies %}
-            <tr>
-                <td>{{ company.name }}</td>
-                <td>
-                    {% if company.logo %}
-                    <img src="{{ company.logo }}" style="height:40px">
-                    {% else %}
-                    —
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="/delete-company/{{ company.id }}" class="btn btn-danger btn-sm">حذف</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="card p-3">
+        <h5>قائمة الشركات</h5>
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>الرقم</th>
+                    <th>اسم الشركة</th>
+                    <th>الشعار</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comp in companies %}
+                <tr>
+                    <td>{{ comp.id }}</td>
+                    <td>{{ comp.name }}</td>
+                    <td>
+                        {% if comp.logo %}
+                        <img src="{{ url_for('uploaded_file', filename=comp.logo) }}" style="height:40px;">
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 </div>
 
 {% endblock %}
-
