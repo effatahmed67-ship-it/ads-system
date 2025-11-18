@@ -1,42 +1,61 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ title if title else "نظام إدارة الإعلانات" }}</title>
+    <meta charset="utf-8">
+    <title>{% block title %}نظام تسجيل الحملات الإعلانية{% endblock %}</title>
 
-    <!-- Bootstrap RTL -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
 
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-
-    <!-- Custom Style -->
-    <link rel="stylesheet" href="/static/css/style.css">
-
+    <!-- خطوط & ستايل -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h4 class="text-center py-3 text-white">لوحة التحكم</h4>
+<div class="app-wrapper">
+    <!-- الشريط الجانبي -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>لوحة التحكم</h2>
+        </div>
 
-        <a href="/" class="menu-item"><i class="bi bi-house"></i> الرئيسية</a>
-        <a href="/clients" class="menu-item"><i class="bi bi-people"></i> العملاء</a>
-        <a href="/add_ad" class="menu-item"><i class="bi bi-bullhorn"></i> الإعلانات</a>
-        <a href="/add_contract" class="menu-item"><i class="bi bi-file-earmark-text"></i> العقود</a>
-        <a href="/ads_report" class="menu-item"><i class="bi bi-graph-up"></i> تقرير الإعلانات</a>
-        <a href="/contracts_report" class="menu-item"><i class="menu-item bi-file-bar-graph"></i> تقرير العقود</a>
-        <a href="/search" class="menu-item"><i class="bi bi-search"></i> البحث</a>
-        <a href="/companies" class="menu-item"><i class="bi bi-building"></i> الشركات</a>
-        <a href="/import_ads" class="menu-item"><i class="bi bi-upload"></i> استيراد الإعلانات</a>
-    </div>
+        <nav class="sidebar-menu">
+            <a href="{{ url_for('home') }}" class="sidebar-link">
+                <span>الرئيسية</span>
+            </a>
+            <a href="{{ url_for('clients') }}" class="sidebar-link">
+                <span>العملاء</span>
+            </a>
+            <a href="{{ url_for('add_ad') }}" class="sidebar-link">
+                <span>الإعلانات</span>
+            </a>
+            <a href="{{ url_for('add_contract') }}" class="sidebar-link">
+                <span>العقود</span>
+            </a>
+            <a href="{{ url_for('ads_report') }}" class="sidebar-link">
+                <span>تقرير الإعلانات</span>
+            </a>
+            <a href="{{ url_for('contracts_report') }}" class="sidebar-link">
+                <span>تقرير العقود</span>
+            </a>
+            <a href="{{ url_for('search') }}" class="sidebar-link">
+                <span>البحث</span>
+            </a>
+            <a href="{{ url_for('companies') }}" class="sidebar-link">
+                <span>الشركات</span>
+            </a>
+            <a href="{{ url_for('import_ads') }}" class="sidebar-link">
+                <span>استيراد الإعلانات</span>
+            </a>
+        </nav>
+    </aside>
 
-    <!-- Page Content -->
-    <div class="page">
-        {% block content %}
-        {% endblock %}
-    </div>
+    <!-- منطقة المحتوى -->
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+</div>
 
 </body>
 </html>
