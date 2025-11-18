@@ -44,5 +44,16 @@
     </div>
 
 </div>
+<div class="odoo-page-header">
+    <div>
+        <h1 class="page-title">تقرير الإعلانات</h1>
+        <p class="page-subtitle">عرض جميع الإعلانات المسجلة مع إمكانية التصدير لإكسل.</p>
+    </div>
+    <div class="odoo-actions">
+        <a href="{{ url_for('export_ads') }}" class="btn btn-sm btn-outline-light">
+            تصدير الإعلانات إلى ملف Excel
+        </a>
+    </div>
+</div>
 
 {% endblock %}
