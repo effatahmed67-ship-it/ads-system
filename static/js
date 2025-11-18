@@ -1,1 +1,20 @@
+// ====== فتح/إغلاق السايدبار في الموبايل ======
+document.addEventListener("DOMContentLoaded", function () {
+    var sidebar = document.querySelector(".sidebar");
+    var toggleBtn = document.getElementById("sidebarToggle");
+
+    if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener("click", function () {
+            sidebar.classList.toggle("open");
+        });
+    }
+
+    // تفعيل اللينك الحالي في السايدبار حسب الرابط
+    var links = document.querySelectorAll(".sidebar-menu a");
+    links.forEach(function (link) {
+        if (link.href === window.location.href) {
+            link.classList.add("active");
+        }
+    });
+});
 
