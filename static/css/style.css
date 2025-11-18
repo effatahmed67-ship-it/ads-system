@@ -1,1 +1,229 @@
+/* ====== الخط العام والتنسيق الأساسي ====== */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
+
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    direction: rtl;
+    text-align: right;
+    font-family: "Tajawal", "Segoe UI", sans-serif;
+    background-color: #f4f5f7;
+    color: #333;
+}
+
+/* ====== تخطيط الصفحة: سايدبار + محتوى ====== */
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ====== الشريط العلوي ====== */
+.topbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.topbar-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.topbar-right span {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* ====== السايدبار ====== */
+.sidebar {
+    width: 240px;
+    background-color: #222b45; /* قريب من Odoo */
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+}
+
+.sidebar-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.sidebar-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0;
+    flex: 1;
+}
+
+.sidebar-menu li {
+    margin: 0.15rem 0.75rem;
+}
+
+.sidebar-menu a {
+    display: block;
+    padding: 0.55rem 0.9rem;
+    border-radius: 0.6rem;
+    color: #e4e9f2;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.05s ease;
+}
+
+.sidebar-menu a:hover {
+    background-color: #151a30;
+    transform: translateX(-2px);
+}
+
+.sidebar-menu a.active {
+    background: linear-gradient(135deg, #00a3ff, #3366ff);
+    color: #fff;
+}
+
+/* زر إخفاء السايدبار في الشاشات الصغيرة */
+.sidebar-toggle-btn {
+    display: none;
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+/* ====== المحتوى الرئيسي ====== */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-inner {
+    padding: 1.5rem 1.75rem;
+}
+
+/* ====== الكروت ====== */
+.card {
+    background-color: #ffffff;
+    border-radius: 0.7rem;
+    border: 1px solid #e4e5eb;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    margin-bottom: 1.25rem;
+}
+
+/* إصلاح الحواف عند استخدام bootstrap .card */
+.card-body {
+    padding: 1.25rem 1.25rem;
+}
+
+/* ====== عناوين الصفحات ====== */
+.page-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+/* ====== أزرار عامة ====== */
+.btn {
+    border-radius: 0.6rem;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #00a3ff, #3366ff);
+    border-color: #3366ff;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #008de0, #274bdb);
+    border-color: #274bdb;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #00c853, #00b248);
+    border-color: #00b248;
+}
+
+.btn-warning {
+    background: #ffb300;
+    border-color: #ffa000;
+    color: #222;
+}
+
+.btn-danger {
+    background: #e53935;
+    border-color: #d32f2f;
+}
+
+/* ====== فورمات ====== */
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+}
+
+.form-control,
+.form-select {
+    border-radius: 0.6rem !important;
+}
+
+/* ====== الجداول ====== */
+.table {
+    font-size: 0.86rem;
+}
+
+.table thead th {
+    background-color: #f5f6fb;
+}
+
+/* ====== تنبيهات ====== */
+.alert {
+    border-radius: 0.7rem;
+}
+
+/* ====== استجابة الموبايل ====== */
+@media (max-width: 992px) {
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: -260px;
+        transition: right 0.2s ease;
+        z-index: 9999;
+    }
+
+    .sidebar.open {
+        right: 0;
+    }
+
+    .sidebar-toggle-btn {
+        display: inline-block;
+    }
+
+    .main-inner {
+        padding: 1rem;
+    }
+}
 
