@@ -1,68 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2 class="page-title">استيراد الإعلانات من Excel</h2>
+<div class="container">
+    <h3 class="mb-4">استيراد الإعلانات من ملف Excel</h3>
 
-<div class="import-box">
-    <form action="/import_ads" method="POST" enctype="multipart/form-data">
+    <div class="card p-4">
 
-        <label class="form-label">رفع ملف Excel:</label>
-        <input type="file" name="file" class="form-control" required>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-warning">
+                {% for m in messages %}
+                    <div>{{ m }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
 
-        <br>
+        <form method="post" action="{{ url_for('upload_ads') }}" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label">اختر ملف الإكسل</label>
+                <input type="file" name="file" class="form-control" required>
+                <small class="text-muted">يجب أن يحتوي الملف على أعمدة: name ، date على الأقل.</small>
+            </div>
 
-        <button class="btn-upload" type="submit">رفع واستيراد</button>
-    </form>
+            <button class="btn btn-success mt-2">رفع واستيراد</button>
+        </form>
+    </div>
 
-    <hr>
-
-    <a class="btn-download" href="/download_ads_template">تحميل ملف النموذج</a>
 </div>
 
-
-<style>
-.import-box {
-    width: 60%;
-    margin: 20px auto;
-    background: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 15px #ccc;
-}
-
-.form-label {
-    font-size: 22px;
-    margin-bottom: 10px;
-}
-
-.form-control {
-    width: 100%;
-    font-size: 20px;
-    padding: 10px;
-}
-
-.btn-upload {
-    width: 100%;
-    background: #4CAF50;
-    color: #fff;
-    padding: 15px;
-    border: none;
-    border-radius: 10px;
-    font-size: 24px;
-}
-
-.btn-download {
-    display: block;
-    width: 100%;
-    background: #2196F3;
-    color: white;
-    padding: 15px;
-    text-align: center;
-    border-radius: 10px;
-    font-size: 22px;
-    text-decoration: none;
-}
-</style>
-
 {% endblock %}
-
