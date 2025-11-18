@@ -7,57 +7,51 @@
 <div class="odoo-page-header">
     <div>
         <h1 class="page-title">تقرير العقود</h1>
-        <p class="page-subtitle">عرض جميع العقود مع بيانات العميل والشركة والمبلغ.</p>
-    </div>
-</div>
-
-<div class="odoo-card mt-2">
-    {% if contracts %}
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle odoo-table">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>رقم العقد</th>
-                    <th>اسم العميل</th>
-                    <th>الشركة</th>
-                    <th>عنوان العقد</th>
-                    <th>المبلغ</th>
-                    <th>تاريخ البداية</th>
-                    <th>تاريخ النهاية</th>
-                    <th>ملاحظات</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for c in contracts %}
-                    <tr>
-                        <td>{{ c["id"] }}</td>
-                        <td>{{ c["contract_number"] }}</td>
-                        <td>{{ c["client_name"] }}</td>
-                        <td>{{ c["company_name"] }}</td>
-                        <td>{{ c["title"] }}</td>
-                        <td>{{ c["amount"] or 0 }}</td>
-                        <td>{{ c["start_date"] }}</td>
-                        <td>{{ c["end_date"] }}</td>
-                        <td>{{ c["notes"] }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <p class="text-muted text-center mb-0">لا توجد عقود مسجلة حتى الآن.</p>
-    {% endif %}
-</div>
-<div class="odoo-page-header">
-    <div>
-        <h1 class="page-title">تقرير العقود</h1>
-        <p class="page-subtitle">عرض جميع العقود مع إمكانية التصدير لإكسل.</p>
+        <p class="page-subtitle">عرض جميع العقود المسجلة مع إمكانية تصدير التقرير إلى Excel.</p>
     </div>
     <div class="odoo-actions">
         <a href="{{ url_for('export_contracts') }}" class="btn btn-sm btn-outline-light">
-            تصدير العقود إلى ملف Excel
+            تصدير العقود إلى Excel
         </a>
+    </div>
+</div>
+
+<div class="odoo-card mt-3">
+    <div class="table-responsive">
+        <table class="table table-hover odoo-table text-center align-middle">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>رقم العقد</th>
+                <th>العميل</th>
+                <th>الشركة</th>
+                <th>العنوان</th>
+                <th>المبلغ</th>
+                <th>تاريخ البداية</th>
+                <th>تاريخ النهاية</th>
+                <th>ملاحظات</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for c in contracts %}
+                <tr>
+                    <td>{{ c.id }}</td>
+                    <td>{{ c.contract_number }}</td>
+                    <td>{{ c.client_name }}</td>
+                    <td>{{ c.company_name }}</td>
+                    <td>{{ c.title }}</td>
+                    <td>{{ "%.2f"|format(c.amount or 0) }}</td>
+                    <td>{{ c.start_date }}</td>
+                    <td>{{ c.end_date }}</td>
+                    <td>{{ c.notes }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="9" class="text-muted">لا توجد عقود مسجلة.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
