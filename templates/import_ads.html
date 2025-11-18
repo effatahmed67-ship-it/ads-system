@@ -28,5 +28,33 @@
         </button>
     </form>
 </div>
+@app.route("/import_ads/template")
+def download_ads_template():
+    # قالب بسيط بالأعمدة الأساسية
+    df = pd.DataFrame(
+        columns=[
+            "name",   # اسم الإعلان (إجباري)
+            "date",   # تاريخ الإعلان (إجباري)
+            "company",
+            "client",
+            "amount",
+            "notes",
+        ]
+    )
+
+    output = BytesIO()
+    # نفس الشي هنا نستخدم openpyxl
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="AdsTemplate")
+    output.seek(0)
+
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name="ads_import_template.xlsx",
+        mimetype=(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ),
+    )
 
 {% endblock %}
